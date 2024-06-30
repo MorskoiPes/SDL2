@@ -33,8 +33,8 @@ int init() {
 }
 
 int load() {
-    john = SDL_LoadBMP("john.jpg");
-
+    john = SDL_LoadBMP("john.bmp");
+    
     if (john == NULL) {
         std::cout << "Can't load image: " << SDL_GetError() << std::endl;
         system("pause");
@@ -55,23 +55,27 @@ int quit() {
 }
 int main(int argc, char** args) {
     if (init() == 1) {
+        quit();
         return 1;
 
     }
 
-    /*if (load() == 1) {
+    if (load() == 1) {
+        quit();
         return 1;
-    }*/
+    }
 
     bool run = true;
     SDL_Event e;
-    SDL_Rect r;
 
-    int x = 0;
-    int y = 0;
+    SDL_Rect bg_flower;
+    bg_flower.w = SCREEN_WIDTH;
+    bg_flower.h = SCREEN_HEIGHT;
+    bg_flower.x = 0;
+    bg_flower.y = 0;
 
-    r.x = x;
-    r.y = y;
+
+    SDL_BlitScaled(john, NULL, scr, &bg_flower);
 
     while (run) {
         while (SDL_PollEvent(&e) != NULL) {
@@ -81,6 +85,10 @@ int main(int argc, char** args) {
                     run = false;
                 }
                 
+            }
+
+            if (e.type == SDL_QUIT) {
+                run = false;
             }
 
             if (e.type == SDL_KEYDOWN) {
