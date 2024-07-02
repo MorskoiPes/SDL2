@@ -9,6 +9,9 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+const int LENGHT = 20;
+const int WIDTH = 10;
+
 SDL_Window* win = NULL;
 SDL_Surface* scr = NULL;
 SDL_Surface* john = NULL;
@@ -31,7 +34,7 @@ int init() {
         return 1;
     }
 
-    win = SDL_CreateWindow("Source", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+    win = SDL_CreateWindow("Source", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_BORDERLESS);
     if (win == NULL) {
         std::cout << "Can't create window: " << SDL_GetError() << std::endl;
         system("pause");
@@ -51,7 +54,21 @@ int init() {
     return 0;
 }
 
+void quadtar(int* x, int* y) {
+
+  
+
+    SDL_Rect fillRect = { *x - (WIDTH / 2) , *y - (LENGHT / 2) , WIDTH , LENGHT };
+
+    SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
+
+    SDL_RenderFillRect(ren, &fillRect);
+
+    
+}
+
 int load() {
+
     john = SDL_LoadBMP("john.bmp");
     
     if (john == NULL) {
@@ -92,6 +109,10 @@ int main(int argc, char** args) {
     
 
     while (run) {
+
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 0);
+        SDL_RenderClear(ren);
+
         while (SDL_PollEvent(&e) != NULL) {
             if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
@@ -118,27 +139,26 @@ int main(int argc, char** args) {
                     x -= 1;
                 }
             }
+
+            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == 1) {
+                x = e.motion.x;
+                y = e.motion.y;
+            }
+
         }
 
         bg.x = x;
         bg.y = y;
+        
+       
+
+        quadtar(&x, &y);
 
         //SDL_FillRect(scr, NULL, SDL_MapRGB(scr->format, 255, 255, 255));
         //SDL_BlitScaled(john, NULL, scr, &bg);
 
-        SDL_SetRenderDrawColor(ren, 0, 0, 0, 0);
-        SDL_RenderClear(ren);
-
-        SDL_Rect fillRect = { x / 2, y / 2, 10 ,10 };
-
-        SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
-
-        SDL_RenderFillRect(ren, &fillRect);
-
+        //SDL_UpdateWindowSurface(win);
         SDL_RenderPresent(ren);
-
-        SDL_UpdateWindowSurface(win);
-
     }
 
     
