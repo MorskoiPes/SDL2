@@ -15,7 +15,7 @@ SDL_Surface* john = NULL;
 SDL_Renderer* ren = NULL;
 
 int quit() {
-    SDL_FreeSurface(john);
+    //SDL_FreeSurface(john);
 
     SDL_DestroyWindow(win);
 
@@ -38,7 +38,7 @@ int init() {
         return 1;
     }
 
-    ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+    ren = SDL_CreateRenderer(win, 1, SDL_RENDERER_ACCELERATED);
 
     if (ren == NULL) {
         std::cout << "Can't create render:" << SDL_GetError() << std::endl;
@@ -71,16 +71,16 @@ int main(int argc, char** args) {
 
     }
 
-    if (load() == 1) {
+    /*if (load() == 1) {
         quit();
         return 1;
-    }
+    }*/
 
     bool run = true;
     SDL_Event e;
 
-    int x = 0;
-    int y = 0;
+    int x = 50;
+    int y = 50;
 
     SDL_Rect bg;
     bg.w = SCREEN_WIDTH;
@@ -88,6 +88,8 @@ int main(int argc, char** args) {
     bg.x = x;
     bg.y = y;
 
+    SDL_RenderClear(ren);
+    
 
     while (run) {
         while (SDL_PollEvent(&e) != NULL) {
@@ -117,19 +119,29 @@ int main(int argc, char** args) {
                 }
             }
         }
+
         bg.x = x;
         bg.y = y;
 
-        SDL_FillRect(scr, NULL, SDL_MapRGB(scr->format, 255, 255, 255));
+        //SDL_FillRect(scr, NULL, SDL_MapRGB(scr->format, 255, 255, 255));
+        //SDL_BlitScaled(john, NULL, scr, &bg);
 
-        SDL_BlitScaled(john, NULL, scr, &bg);
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 0);
+        SDL_RenderClear(ren);
+
+        SDL_Rect fillRect = { x / 2, y / 2, 10 ,10 };
+
+        SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
+
+        SDL_RenderFillRect(ren, &fillRect);
+
+        SDL_RenderPresent(ren);
 
         SDL_UpdateWindowSurface(win);
+
     }
 
-    SDL_Rect fillRect = { SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
-    SDL_SetRenderDrawColor(ren, 255,0,0,255);
-    SDL_RenderFillRect(ren,&fillRect);
+    
 
     quit();
 }
