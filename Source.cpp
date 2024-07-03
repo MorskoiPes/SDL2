@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <map>
 
 
 #define SDL_MAIN_HANDLED
@@ -16,6 +18,8 @@ SDL_Window* win = NULL;
 SDL_Surface* scr = NULL;
 SDL_Surface* john = NULL;
 SDL_Renderer* ren = NULL;
+
+
 
 int quit() {
     //SDL_FreeSurface(john);
@@ -54,9 +58,8 @@ int init() {
     return 0;
 }
 
-void quadtar(int* x, int* y) {
+void quadrat(int* x, int* y) {
 
-  
 
     SDL_Rect fillRect = { *x - (WIDTH / 2) , *y - (LENGHT / 2) , WIDTH , LENGHT };
 
@@ -80,6 +83,13 @@ int load() {
     return 0;
 }
 
+class Quadrats {
+public:
+    int X_position = 0;
+    int Y_position = 0;
+
+};
+
 
 int main(int argc, char** args) {
     if (init() == 1) {
@@ -93,12 +103,16 @@ int main(int argc, char** args) {
         return 1;
     }*/
 
+    int count = 0;
+
     bool run = true;
     SDL_Event e;
 
     int x = 50;
     int y = 50;
 
+    std::vector<std::pair<int, int>> position_member;
+    std::pair<int, int> x_y_position;
     SDL_Rect bg;
     bg.w = SCREEN_WIDTH;
     bg.h = SCREEN_HEIGHT;
@@ -106,7 +120,9 @@ int main(int argc, char** args) {
     bg.y = y;
 
     SDL_RenderClear(ren);
-    
+
+
+
 
     while (run) {
 
@@ -118,7 +134,7 @@ int main(int argc, char** args) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
                     run = false;
                 }
-   
+
             }
 
             if (e.type == SDL_QUIT) {
@@ -138,30 +154,72 @@ int main(int argc, char** args) {
                 if (e.key.keysym.sym == SDLK_LEFT) {
                     x -= 1;
                 }
+                if (e.key.keysym.sym == SDLK_1) {
+                    SDL_SetWindowSize(win, 640, 480);
+                    SDL_SetWindowPosition(win, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+                }
+                if (e.key.keysym.sym == SDLK_2) {
+                    SDL_SetWindowSize(win, 1080, 720);
+                    SDL_SetWindowPosition(win, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+                }
             }
 
             if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == 1) {
-                x = e.motion.x;
-                y = e.motion.y;
-            }
+                count += 1;
 
+                x_y_position.first = e.motion.x;
+                x_y_position.second = e.motion.y;
+
+                position_member.push_back(x_y_position);
+
+            }
+            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == 3) {
+
+                count -= 1;
+                int mouse_p_x = e.motion.x;
+                int mouse_p_y = e.motion.y;
+                int g = 0;
+
+                //for(std::pair<int, int> i : position_member)
+
+                for (int g = 0; g < position_member.size();g++) {
+                    
+                    int x_p_min = position_member[g].first - (WIDTH / 2), y_p_min = position_member[g].second - (LENGHT / 2), x_p_max = position_member[g].first + (WIDTH / 2), y_p_max = position_member[g].second + (LENGHT / 2);
+                    /*
+                    std::cout << mouse_p_x << "\t" << mouse_p_y << std::endl;
+                    std::cout << x_p_min << "\t" << x_p_max << std::endl;
+                    std::cout << y_p_min << "\t" << y_p_max << "\n" << std::endl;
+                    */
+                    if (x_p_min <= mouse_p_x && mouse_p_x <= x_p_max && y_p_min <= mouse_p_y && mouse_p_y <= y_p_max) {
+
+                        //std::cout << i.first << "\t" << i.second << std::endl;
+                        //std::cout << e.motion.x << "\t" << e.motion.y << std::endl;
+
+                        position_member.erase(position_member.begin() + g);
+
+                    }
+                    
+                }
+            }
         }
 
         bg.x = x;
         bg.y = y;
-        
-       
 
-        quadtar(&x, &y);
+        for (std::pair<int, int> i : position_member) {
+
+            quadrat(&i.first, &i.second);
+
+        }
+
+
 
         //SDL_FillRect(scr, NULL, SDL_MapRGB(scr->format, 255, 255, 255));
         //SDL_BlitScaled(john, NULL, scr, &bg);
 
-        //SDL_UpdateWindowSurface(win);
+        SDL_UpdateWindowSurface(win);
         SDL_RenderPresent(ren);
     }
-
-    
 
     quit();
 }
